@@ -1,0 +1,89 @@
+# This workflow automates the OpenWrt build process based on your provided bash script.
+# It clones the necessary repositories, configures feed revisions, and runs the autobuild script.
+
+name: OpenWrt Custom Build 🛠️
+
+# Define when this workflow should run.
+on:
+  # Allows you to run this workflow manually from the GitHub Actions UI.
+  workflow_dispatch:
+  # You can also uncomment the 'push' event to trigger on code changes.
+  # push:
+  #   branches:
+  #     - main
+  #     - develop
+
+# Define the jobs that will be executed as part of this workflow.
+jobs:
+  build-openwrt:
+    name: Build OpenWrt Firmware
+    # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
+    # For very resource-intensive builds, consider using a 'self-hosted' runner.
+    runs-on: self-hosted
+
+    steps:
+      # Step 1: Checkout the repository where this workflow file resides.
+      # This is important if your workflow depends on other files in your main repository.
+      - name: Checkout Workflow Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install necessary build dependencies for OpenWrt.
+      # These packages are commonly required for compiling OpenWrt.
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev \
+            xsltproc file unzip wget python3 rsync curl subversion libglib2.0-dev \
+            libtool autoconf pkg-config upx-ucl libelf-dev device-tree-compiler \
+            python3-distutils python3-setuptools python3-pip
+
+      # Step 3: Clone the main OpenWrt source repository.
+      # Replace 'https://github.com/openwrt/openwrt.git' with the actual URL if different.
+      - name: Clone OpenWrt Repository
+        run: |
+          git clone https://github.com/openwrt/openwrt.git openwrt
+          # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
+          cd openwrt
+          # Uncomment the line below to checkout a specific commit, as in your original script:
+          cd - # Go back to the root of the workspace
+
+      # Step 4: Clone the MTK OpenWrt Feeds repository.
+      - name: Clone MTK OpenWrt Feeds Repository
+        run: |
+          git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
+          # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
+          cd mtk-openwrt-feeds
+          # Uncomment the line below to checkout a specific commit, as in your original script:
+          cd - # Go back to the root of the workspace
+
+      # Step 5: Configure the feed_revision file with specific commit hashes.
+      # This step is executed from the 'openwrt' directory, allowing relative paths.
+      - name: Configure Feed Revisions
+        working-directory: ./openwrt
+        run: |
+          # Set shell options for robustness: exit on error, treat unset variables as error, print commands.
+          set -euo pipefail
+          echo "packages de909258525bdb3e227c8e6fc1b61329e9a11f62" > ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+          echo "luci 8d367398d626436e67478da447ce4a4ffe7992e2" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+          echo "routing d53907107d48331ef38978f7a259bc8eac3765a0" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+          echo "telephony 44d6355a7b2d69dd25d73913811b421fc504b836" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+          echo "video 1668ab74cf47cdec753895e70007083ba9c69fe4" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+
+      # Step 6: Run the main OpenWrt autobuild script.
+      # The 'working-directory' ensures the script runs from the 'openwrt' directory,
+      # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
+      - name: Run OpenWrt Autobuild Script
+        working-directory: ./openwrt
+        run: |
+          set -euo pipefail
+          bash ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make
+
+
+      # Step 7: Run the main OpenWrt autobuild script.
+      # The 'working-directory' ensures the script runs from the 'openwrt' directory,
+      # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
+      - name: Run OpenWrt Autobuild Script
+        working-directory: ./openwrt
+        run: |
+          set -euo pipefail
+          make -j3 V=s
