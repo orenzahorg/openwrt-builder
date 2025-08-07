@@ -66,7 +66,7 @@ jobs:
         working-directory: ./
         run: |
           set -euo pipefail
-          sudo docker run --interactive --rm --tty --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash ./mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make
+          sudo docker run --interactive --rm --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash ./mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make
 
 
       # Step 7: Run the main OpenWrt autobuild script.
