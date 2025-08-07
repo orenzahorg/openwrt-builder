@@ -3,7 +3,7 @@ import os
 import sys
 import logging
 import subprocess
-
+import shutil
 
 def run_command(command: list[str], cwd: str = None):
     result = subprocess.run(command, shell=True, capture_output=True, text=True, cwd=cwd)
@@ -26,7 +26,7 @@ def main():
         run_command(["git", "clone", "https://github.com/openwrt/openwrt.git"])
     else:
         logging.info("openwrt directory exists")
-        run_command(["cp", "-r", f"{home_dir}/openwrt-bkp", "openwrt"])
+        shutil.copytree(f"{home_dir}/openwrt-bkp", "openwrt")
     # check if mtk-openwrt-feeds directory exists
     # git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
     logging.info("Checking if mtk-openwrt-feeds directory exists")
@@ -35,7 +35,7 @@ def main():
         run_command(["git", "clone", "https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds", "mtk-openwrt-feeds"])
     else:
         logging.info("mtk-openwrt-feeds directory exists")
-        run_command(["cp", "-r", f"{home_dir}/mtk-openwrt-feeds-bkp", "mtk-openwrt-feeds"])
+        shutil.copytree(f"{home_dir}/mtk-openwrt-feeds-bkp", "mtk-openwrt-feeds")
 
     
     
