@@ -56,10 +56,11 @@ jobs:
       # This step is executed from the 'openwrt' directory, allowing relative paths.
       # set the repo name ${reponame}/openwrt
       - name: Configure Feed Revisions
-        working-directory: openwrt-builder/openwrt
+        working-directory: openwrt
         run: |
           # Set shell options for robustness: exit on error, treat unset variables as error, print commands.
           set -euo pipefail
+          ls -ahl
           echo "packages de909258525bdb3e227c8e6fc1b61329e9a11f62" > ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "luci 8d367398d626436e67478da447ce4a4ffe7992e2" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "routing d53907107d48331ef38978f7a259bc8eac3765a0" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision

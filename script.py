@@ -28,6 +28,7 @@ def main():
         run_command(["git", "clone", "https://github.com/openwrt/openwrt.git"])
     else:
         logging.info("openwrt directory exists")
+        logging.info(f"Copying {home_dir}/openwrt-bkp to openwrt")
         shutil.copytree(f"{home_dir}/openwrt-bkp", "openwrt")
     # check if mtk-openwrt-feeds directory exists
     # git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
@@ -37,6 +38,7 @@ def main():
         run_command(["git", "clone", "https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds", "mtk-openwrt-feeds"])
     else:
         logging.info("mtk-openwrt-feeds directory exists")
+        logging.info(f"Copying {home_dir}/mtk-openwrt-feeds-bkp to mtk-openwrt-feeds")
         shutil.copytree(f"{home_dir}/mtk-openwrt-feeds-bkp", "mtk-openwrt-feeds")
 
     
