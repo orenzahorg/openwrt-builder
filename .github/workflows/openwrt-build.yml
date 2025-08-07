@@ -19,8 +19,8 @@ jobs:
     name: Build OpenWrt Firmware
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
-    needs: pull-repositories
-    runs-on: self-hosted
+    # needs: pull-repositories
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the repository where this workflow file resides.
