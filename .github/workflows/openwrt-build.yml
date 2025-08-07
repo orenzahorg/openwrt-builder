@@ -76,4 +76,4 @@ jobs:
         working-directory: ./openwrt
         run: |
           set -euo pipefail
-          sudo docker run --interactive --rm --tty --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'make -j3 V=s'
+          sudo docker run --interactive --rm --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'make -j3 V=s'
