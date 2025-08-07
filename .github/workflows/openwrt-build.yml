@@ -28,7 +28,7 @@ jobs:
       - name: Checkout Workflow Repository
         uses: actions/checkout@v4
 
-    -   name: Pull OpenWrt Repository
+      - name: Pull OpenWrt Repository
         run: |
           python3 script.py
 
