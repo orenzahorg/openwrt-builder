@@ -15,19 +15,6 @@ on:
 
 # Define the jobs that will be executed as part of this workflow.
 jobs:
-  pull-repositories:
-    name: Pull Repositories
-    runs-on: self-hosted
-    steps:
-      # Step 1: Checkout the repository where this workflow file resides.
-      # This is important if your workflow depends on other files in your main repository.
-      - name: Checkout Workflow Repository
-        uses: actions/checkout@v4
-
-      - name: Pull OpenWrt Repository
-        run: |
-          python3 script.py
-
   build-openwrt:
     name: Build OpenWrt Firmware
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
@@ -40,6 +27,11 @@ jobs:
       # This is important if your workflow depends on other files in your main repository.
       - name: Checkout Workflow Repository
         uses: actions/checkout@v4
+
+    -   name: Pull OpenWrt Repository
+        run: |
+          python3 script.py
+
 
       # Step 3: Clone the main OpenWrt source repository.
       # Replace 'https://github.com/openwrt/openwrt.git' with the actual URL if different.
