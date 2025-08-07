@@ -20,7 +20,7 @@ jobs:
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
     # needs: pull-repositories
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       # Step 1: Checkout the repository where this workflow file resides.

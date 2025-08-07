@@ -21,6 +21,8 @@ def main():
     logging.info("Checking if openwrt directory exists")
      
     home_dir = os.path.expanduser("~")
+    logging.info(f"Home directory: {home_dir}")
+    logging.info(f"Checking for {home_dir}/openwrt-bkp")    
     if not os.path.exists(f"{home_dir}/openwrt-bkp"):
         logging.error("openwrt directory does not exist")
         run_command(["git", "clone", "https://github.com/openwrt/openwrt.git"])
