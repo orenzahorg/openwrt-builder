@@ -19,6 +19,11 @@ jobs:
     name: Pull Repositories
     runs-on: self-hosted
     steps:
+      # Step 1: Checkout the repository where this workflow file resides.
+      # This is important if your workflow depends on other files in your main repository.
+      - name: Checkout Workflow Repository
+        uses: actions/checkout@v4
+            
       - name: Pull OpenWrt Repository
         run: |
           python3 script.py
@@ -27,6 +32,7 @@ jobs:
     name: Build OpenWrt Firmware
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
+    needs: pull-repositories
     runs-on: self-hosted
 
     steps:
@@ -37,22 +43,22 @@ jobs:
 
       # Step 3: Clone the main OpenWrt source repository.
       # Replace 'https://github.com/openwrt/openwrt.git' with the actual URL if different.
-      - name: Clone OpenWrt Repository
-        run: |
-          git clone https://github.com/openwrt/openwrt.git openwrt
-          # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
-          cd openwrt
-          # Uncomment the line below to checkout a specific commit, as in your original script:
-          cd - # Go back to the root of the workspace
+      # - name: Clone OpenWrt Repository
+      #   run: |
+      #     git clone https://github.com/openwrt/openwrt.git openwrt
+      #     # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
+      #     cd openwrt
+      #     # Uncomment the line below to checkout a specific commit, as in your original script:
+      #     cd - # Go back to the root of the workspace
 
-      # Step 4: Clone the MTK OpenWrt Feeds repository.
-      - name: Clone MTK OpenWrt Feeds Repository
-        run: |
-          git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
-          # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
-          cd mtk-openwrt-feeds
-          # Uncomment the line below to checkout a specific commit, as in your original script:
-          cd - # Go back to the root of the workspace
+      # # Step 4: Clone the MTK OpenWrt Feeds repository.
+      # - name: Clone MTK OpenWrt Feeds Repository
+      #   run: |
+      #     git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
+      #     # Navigate into the cloned directory and pull latest changes (redundant after clone, but matches script's git pull)
+      #     cd mtk-openwrt-feeds
+      #     # Uncomment the line below to checkout a specific commit, as in your original script:
+      #     cd - # Go back to the root of the workspace
 
       # Step 5: Configure the feed_revision file with specific commit hashes.
       # This step is executed from the 'openwrt' directory, allowing relative paths.
