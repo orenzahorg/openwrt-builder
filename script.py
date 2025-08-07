@@ -7,6 +7,7 @@ import subprocess
 
 def run_command(command: list[str], cwd: str = None):
     result = subprocess.run(command, shell=True, capture_output=True, text=True, cwd=cwd)
+    logging.info(f"Command: {command} executed with result: {result.stdout}")
     return result.stdout, result.stderr
 
 def setup_logging():
