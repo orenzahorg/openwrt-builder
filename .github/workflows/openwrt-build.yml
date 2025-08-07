@@ -15,6 +15,14 @@ on:
 
 # Define the jobs that will be executed as part of this workflow.
 jobs:
+  pull-repositories:
+    name: Pull Repositories
+    runs-on: self-hosted
+    steps:
+      - name: Pull OpenWrt Repository
+        run: |
+          python3 script.py
+
   build-openwrt:
     name: Build OpenWrt Firmware
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
