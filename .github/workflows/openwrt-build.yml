@@ -70,7 +70,6 @@ jobs:
     needs: build-mtk-openwrt-feeds
     steps:
       - name: Configure OpenWrt
-        working-directory: openwrt
         run: |
           echo 'CONFIG_PINCTRL_MT7987=y' >> openwrt/target/linux/mediatek/filogic/config-6.6
       - name: Defconfig
