@@ -27,6 +27,10 @@ jobs:
     runs-on: self-hosted
     needs: checkout-openwrt
     steps:
+      - name: Clean OpenWrt Repository
+        run: |
+          rm -rf openwrt
+          rm -rf mtk-openwrt-feeds
       - name: Pull OpenWrt Repository
         run: |
           python3 script.py
@@ -49,7 +53,6 @@ jobs:
         run: |
           # Set shell options for robustness: exit on error, treat unset variables as error, print commands.
           set -euo pipefail
-          ls -ahl
           echo "packages de909258525bdb3e227c8e6fc1b61329e9a11f62" > ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "luci 8d367398d626436e67478da447ce4a4ffe7992e2" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "routing d53907107d48331ef38978f7a259bc8eac3765a0" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
@@ -61,13 +64,27 @@ jobs:
           set -euo pipefail
           docker run --interactive --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
 
+  defconfig:
+    name: Configure OpenWrt
+    runs-on: self-hosted
+    needs: build-mtk-openwrt-feeds
+    steps:
+      - name: Configure OpenWrt
+        working-directory: openwrt
+        run: |
+          echo 'CONFIG_PINCTRL_MT7987=y' >> openwrt/target/linux/mediatek/filogic/config-6.6
+      - name: Defconfig
+        working-directory: openwrt
+        run: |
+          make defconfig
+
   build-openwrt:
     name: Build OpenWrt
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
     # needs: pull-repositories
     runs-on: self-hosted
-    needs: build-mtk-openwrt-feeds
+    needs: defconfig
       # Step 6: Run the main OpenWrt autobuild script.
       # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
     steps:
