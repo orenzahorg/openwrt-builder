@@ -70,7 +70,7 @@ jobs:
     needs: build-mtk-openwrt-feeds
       # Step 6: Run the main OpenWrt autobuild script.
       # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
-
+    steps:
 
       # Step 7: Run the main OpenWrt autobuild script.
       # The 'working-directory' ensures the script runs from the 'openwrt' directory,
