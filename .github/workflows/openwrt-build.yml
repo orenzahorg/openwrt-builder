@@ -90,7 +90,7 @@ jobs:
       - name: Run mtk-openwrt-feeds Autobuild Script
         run: |
           set -euo pipefail
-          docker exec -it openwrt-imagebuilder /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
 
   defconfig:
     name: Configure OpenWrt
@@ -103,7 +103,7 @@ jobs:
       - name: Defconfig
         working-directory: openwrt
         run: |
-          docker exec -it openwrt-imagebuilder /bin/bash -c 'cd openwrt && make defconfig'
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make defconfig'
 
   build-openwrt:
     name: Build OpenWrt
