@@ -137,12 +137,15 @@ jobs:
   clean-up-docker-container-success:
     needs: upload-artifacts
     if: ${{ needs.upload-artifacts.result == 'success' }}
-
-    run: |
-      docker stop openwrt-imagebuilder
+    steps:
+      - name: Clean Up Docker Container
+        run: |
+          docker stop openwrt-imagebuilder
 
   clean-up-docker-container-failed:
     needs: build-openwrt
     if: ${{ always() && !cancelled() && (needs.build-openwrt.result != 'success') }}
-    run: |
-      docker stop openwrt-imagebuilder
+    steps:
+      - name: Clean Up Docker Container
+        run: |
+          docker stop openwrt-imagebuilder
