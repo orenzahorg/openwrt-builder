@@ -16,11 +16,16 @@ on:
 # Define the jobs that will be executed as part of this workflow.
 jobs:
   checkout-openwrt:
-    name: Checkout OpenWrt Repository
+    name: Clean and Checkout OpenWrt Repository
     runs-on: self-hosted
     steps:
+      - name: Clean OpenWrt Repository
+        run: |
+          rm -rf openwrt
+          rm -rf mtk-openwrt-feeds
       - name: Checkout Workflow Repository
         uses: actions/checkout@v4
+
         
   pull-repositories:
     name: Pull Repositories
@@ -38,10 +43,17 @@ jobs:
         run: |
           cd openwrt
           git switch openwrt-24.10
+      - name: Fetch Repositories
+        run: |
+          cd openwrt
+          git pull
+          cd ..
+          cd mtk-openwrt-feeds
+          git pull
 
 
-  build-mtk-openwrt-feeds:
-    name: Build MTK Feeds
+  configure-openwrt-feeds:
+    name: Configure MTK Feeds
     # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
     # needs: pull-repositories
@@ -58,11 +70,24 @@ jobs:
           echo "routing d53907107d48331ef38978f7a259bc8eac3765a0" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "telephony 44d6355a7b2d69dd25d73913811b421fc504b836" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "video 1668ab74cf47cdec753895e70007083ba9c69fe4" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
-     
+  start-docker-container:
+    name: Start Docker Container
+    runs-on: self-hosted
+    needs: configure-openwrt-feeds
+    steps:
+      - name: Start Docker Container
+        run: |
+          docker run --name openwrt-imagebuilder --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'sleep infinity'
+
+  build-mtk-openwrt-feeds:
+    name: Build MTK Feeds
+    runs-on: self-hosted
+    needs: configure-openwrt-feeds
+    steps:
       - name: Run mtk-openwrt-feeds Autobuild Script
         run: |
           set -euo pipefail
-          docker run --interactive --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
+          docker exec -it openwrt-imagebuilder /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
 
   defconfig:
     name: Configure OpenWrt
@@ -75,7 +100,7 @@ jobs:
       - name: Defconfig
         working-directory: openwrt
         run: |
-          make defconfig
+          docker exec -it openwrt-imagebuilder /bin/bash -c 'cd openwrt && make defconfig'
 
   build-openwrt:
     name: Build OpenWrt
@@ -87,7 +112,6 @@ jobs:
       # Step 6: Run the main OpenWrt autobuild script.
       # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
     steps:
-
       # Step 7: Run the main OpenWrt autobuild script.
       # The 'working-directory' ensures the script runs from the 'openwrt' directory,
       # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
@@ -95,7 +119,7 @@ jobs:
         working-directory: openwrt
         run: |
           set -euo pipefail
-          docker run --interactive --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'make -j$(($(nproc)+1)) V=s'
+          docker exec -it openwrt-imagebuilder /bin/bash -c 'cd openwrt && make -j$(($(nproc)+1)) V=s'
 
   upload-artifacts:
     name: Upload Artifacts
@@ -107,4 +131,10 @@ jobs:
         with:
           name: openwrt
           path: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
-          
+  clean-up-docker-container:
+    name: Clean Up Docker Container
+    runs-on: self-hosted
+    steps:
+      - name: Clean Up Docker Container
+        run: |
+          docker stop openwrt-imagebuilder
