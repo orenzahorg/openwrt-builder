@@ -78,6 +78,8 @@ jobs:
     steps:
       - name: Start Docker Container
         run: |
+          docker stop openwrt-imagebuilder || true
+          docker rm openwrt-imagebuilder || true
           docker run --name openwrt-imagebuilder --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' -d openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'sleep infinity'
 
   build-mtk-openwrt-feeds:
