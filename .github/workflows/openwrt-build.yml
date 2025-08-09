@@ -70,6 +70,7 @@ jobs:
           echo "routing d53907107d48331ef38978f7a259bc8eac3765a0" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "telephony 44d6355a7b2d69dd25d73913811b421fc504b836" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
           echo "video 1668ab74cf47cdec753895e70007083ba9c69fe4" >> ../mtk-openwrt-feeds/autobuild/unified/feed_revision
+
   start-docker-container:
     name: Start Docker Container
     runs-on: self-hosted
@@ -82,7 +83,7 @@ jobs:
   build-mtk-openwrt-feeds:
     name: Build MTK Feeds
     runs-on: self-hosted
-    needs: configure-openwrt-feeds
+    needs: start-docker-container
     steps:
       - name: Run mtk-openwrt-feeds Autobuild Script
         run: |
@@ -131,7 +132,7 @@ jobs:
         with:
           name: openwrt
           path: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
-          
+
   clean-up-docker-container:
     name: Clean Up Docker Container
     runs-on: self-hosted
