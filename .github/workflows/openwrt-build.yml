@@ -133,10 +133,14 @@ jobs:
           name: openwrt
           path: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz
 
-  clean-up-docker-container:
-    name: Clean Up Docker Container
-    runs-on: self-hosted
-    steps:
-      - name: Clean Up Docker Container
-        run: |
-          docker stop openwrt-imagebuilder
+
+  clean-up-docker-container-success:
+    needs: upload-artifacts
+    if: ${{ needs.job1.result == 'success' && needs.job2.result == 'success' }}
+    run: |
+      docker stop openwrt-imagebuilder
+  clean-up-docker-container-failed:
+    needs: build-openwrt
+    if: ${{ always() && !cancelled() && (needs.job1.result != 'success' || needs.job2.result != 'success') }}
+    run: |
+      docker stop openwrt-imagebuilder
