@@ -1,0 +1,47 @@
+# This workflow automates the OpenWrt build process based on your provided bash script.
+# It clones the necessary repositories, configures feed revisions, and runs the autobuild script.
+
+name: Test Artifacts OpenWrt Custom Build 🛠️
+
+# Define when this workflow should run.
+on:
+  # Allows you to run this workflow manually from the GitHub Actions UI.
+  workflow_dispatch:
+  # You can also uncomment the 'push' event to trigger on code changes.
+  # push:
+  #   branches:
+  #     - main
+  #     - develop
+
+# Define the jobs that will be executed as part of this workflow.
+jobs:
+  upload-artifacts:
+    name: Upload Artifacts
+    runs-on: self-hosted
+    steps:
+      - name: Test Artifacts
+        run: |
+          touch test_file.tar.gz
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_file
+          path: test_file.tar.gz
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: test_file.tar.gz
+          asset_name: test_file.tar.gz
+          asset_content_type: application/octet-stream
+
