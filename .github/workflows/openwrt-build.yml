@@ -1,7 +1,7 @@
 # This workflow automates the OpenWrt build process based on your provided bash script.
 # It clones the necessary repositories, configures feed revisions, and runs the autobuild script.
 
-name: OpenWrt Custom Build 🛠️
+name: OpenWrt BPI-R4 SD Card Image Build 🛠️
 
 # Define when this workflow should run.
 on:
