@@ -135,6 +135,10 @@ jobs:
       #   with:
       #     name: openwrt
       #     path: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz 
+      - name: "Set current date as env variable"
+        run: |
+          echo "builddate=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+        id: version  # this is used on variable path          
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
