@@ -18,6 +18,10 @@ jobs:
   upload-artifacts:
     name: Upload Artifacts
     runs-on: self-hosted
+    permissions:
+      contents: write
+      packages: write
+      id-token: write      
     steps:
       - name: Test Artifacts
         run: |
