@@ -40,8 +40,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: create_release  
         uses: ncipollo/release-action@v1.18.0
-        with:
-          tag_name: ${{ steps.version.outputs.builddate }}
+        with:          
+          tag: ${{ steps.version.outputs.builddate }}
           release_name: OpenWRT BPI-R4 SD Card Image ${{ steps.date.outputs.date }}
           artifacts: test_file.tar.gz
           artifactContentType: application/octet-stream
