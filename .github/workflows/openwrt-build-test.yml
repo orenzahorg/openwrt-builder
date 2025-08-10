@@ -32,9 +32,9 @@ jobs:
           name: test_file
           path: test_file.tar.gz
       - name: Create Release
-        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: create_release  
         uses: actions/create-release@v1
         with:
           tag_name: ${{ github.ref_name }}
