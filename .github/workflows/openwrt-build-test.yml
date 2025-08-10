@@ -33,26 +33,17 @@ jobs:
           path: test_file.tar.gz
       - name: "Set current date as env variable"
         run: |
-          echo "builddate=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "builddate=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
         id: version  # this is used on variable path          
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: create_release  
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1.18.0
         with:
           tag_name: ${{ steps.version.outputs.builddate }}
           release_name: OpenWRT BPI-R4 SD Card Image ${{ steps.date.outputs.date }}
+          artifacts: test_file.tar.gz
+          artifactContentType: application/octet-stream
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: test_file.tar.gz
-          asset_name: test_file.tar.gz
-          asset_content_type: application/octet-stream
-
