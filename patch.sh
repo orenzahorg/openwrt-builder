@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -exu -o pipefail
 
 cd openwrt
 echo 'CONFIG_PINCTRL_MT7987=y' >> target/linux/mediatek/filogic/config-6.6

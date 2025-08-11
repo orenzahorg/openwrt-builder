@@ -44,7 +44,8 @@ jobs:
           rm -rf mtk-openwrt-feeds
       - name: Pull OpenWrt Repository
         run: |
-          python3 script.py
+          git clone https://github.com/openwrt/openwrt.git
+          git clone https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds mtk-openwrt-feeds
       - name: Switch to OpenWrt 24.10
         run: |
           cd openwrt
@@ -95,7 +96,7 @@ jobs:
     steps:
       - name: Run mtk-openwrt-feeds Autobuild Script
         run: |
-          set -euo pipefail
+          set -exu -o pipefail
           docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt7988_rfb-mt7996 log_file=make'
 
   defconfig:
@@ -127,7 +128,7 @@ jobs:
       - name: Run OpenWrt Build
         working-directory: openwrt
         run: |
-          set -euo pipefail
+          set -exu -o pipefail
           docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make -j$(($(nproc)+1)) V=s'
 
   upload-artifacts:
