@@ -159,20 +159,20 @@ jobs:
           prerelease: false
 
 
-  clean-up-docker-container-success:
-    needs: upload-artifacts
-    runs-on: self-hosted
-    if: ${{ needs.upload-artifacts.result == 'success' }}
-    steps:
-      - name: Clean Up Docker Container
-        run: |
-          docker stop openwrt-imagebuilder
+  # clean-up-docker-container-success:
+  #   needs: upload-artifacts
+  #   runs-on: self-hosted
+  #   if: ${{ needs.upload-artifacts.result == 'success' }}
+  #   steps:
+  #     - name: Clean Up Docker Container
+  #       run: |
+  #         docker stop openwrt-imagebuilder
 
-  clean-up-docker-container-failed:
-    needs: build-openwrt
-    runs-on: self-hosted
-    if: ${{ always() && !cancelled() && (needs.build-openwrt.result != 'success') }}
-    steps:
-      - name: Clean Up Docker Container
-        run: |
-          docker stop openwrt-imagebuilder
+  # clean-up-docker-container-failed:
+  #   needs: build-openwrt
+  #   runs-on: self-hosted
+  #   if: ${{ always() && !cancelled() && (needs.build-openwrt.result != 'success') }}
+  #   steps:
+  #     - name: Clean Up Docker Container
+  #       run: |
+  #         docker stop openwrt-imagebuilder
