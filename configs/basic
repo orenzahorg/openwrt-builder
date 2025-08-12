@@ -1,0 +1,31 @@
+#
+# curl -SL https://raw.githubusercontent.com/danpawlik/openwrt-builder/master/configs/<target>/<some device> > .config
+# curl -SL https://raw.githubusercontent.com/danpawlik/openwrt-builder/master/configs/common/basic >> .config
+#
+
+# LuCI
+CONFIG_PACKAGE_cgi-io=y
+CONFIG_PACKAGE_liblucihttp=y
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_luci-app-firewall=y
+CONFIG_PACKAGE_luci-app-opkg=y
+CONFIG_PACKAGE_luci-base=y
+CONFIG_PACKAGE_luci-lib-base=y
+CONFIG_PACKAGE_luci-lib-ip=y
+CONFIG_PACKAGE_luci-lib-jsonc=y
+CONFIG_PACKAGE_luci-lib-nixio=y
+CONFIG_PACKAGE_luci-mod-admin-full=y
+CONFIG_PACKAGE_luci-mod-network=y
+CONFIG_PACKAGE_luci-mod-status=y
+CONFIG_PACKAGE_luci-mod-system=y
+CONFIG_PACKAGE_luci-proto-ipv6=y
+CONFIG_PACKAGE_luci-proto-ppp=y
+
+# attendedsysupgrade / owut
+CONFIG_PACKAGE_owut=y
+
+# Disable CONFIG_ALL_KMODS
+# More: https://github.com/openwrt/openwrt/commit/dadad6bb731ff1025125c619da7ccc196ad6ea01
+# CONFIG_ALL_KMODS is not set
+CONFIG_AUTOREMOVE=y

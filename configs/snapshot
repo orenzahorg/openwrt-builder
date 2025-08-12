@@ -1,0 +1,18 @@
+### Additional configs to be more "compatible" with OpenWRT build bots.
+### https://downloads.openwrt.org/snapshots/targets/<your model>/config.buildinfo
+# CONFIG_ALL_KMODS=y
+CONFIG_ALL_NONSHARED=y
+CONFIG_DEVEL=y
+CONFIG_AUTOREMOVE=y
+CONFIG_COLLECT_KERNEL_DEBUG=y
+CONFIG_IB=y
+CONFIG_JSON_CYCLONEDX_SBOM=y
+CONFIG_MAKE_TOOLCHAIN=y
+CONFIG_REPRODUCIBLE_DEBUG_INFO=y
+CONFIG_SDK=y
+CONFIG_SDK_LLVM_BPF=y
+
+# CONFIG_USE_GC_SECTIONS=y
+# CONFIG_USE_LTO=y
+# Compile littlebit faster
+CONFIG_USE_MOLD=y

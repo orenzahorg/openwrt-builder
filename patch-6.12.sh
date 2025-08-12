@@ -3,8 +3,17 @@ set -exu -o pipefail
 
 cd openwrt
 
+
+for config in ../configs/*; do
+  cat $config >> .config
+done
+
+
+
+
 cat ../configs/bpi-r4 > .config
 cat ../configs/main-router >> .config
+
 
 # add CONFIG_PINCTRL_MT7987=y
 echo 'CONFIG_PINCTRL_MT7987=y' >> target/linux/mediatek/filogic/config-6.12
