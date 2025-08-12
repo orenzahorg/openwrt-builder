@@ -87,7 +87,7 @@ jobs:
         working-directory: openwrt
         run: |
           set -exu -o pipefail
-          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make -j$(($(nproc)+1)) V=s'
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make -j$(($(nproc)-1)) V=s'
 
   upload-artifacts:
     name: Upload Artifacts
