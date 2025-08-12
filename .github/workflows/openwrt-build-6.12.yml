@@ -61,14 +61,15 @@ jobs:
     runs-on: self-hosted
     needs: start-docker-container
     steps:
-      - name: Configure OpenWrt
-        run: |
-          set -exu -o pipefail
-          bash patch-6.12.sh
       - name: Defconfig
         working-directory: openwrt
         run: |
           docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make defconfig'
+      - name: Configure OpenWrt
+        run: |
+          set -exu -o pipefail
+          bash patch-6.12.sh
+
 
   build-openwrt:
     name: Build OpenWrt
