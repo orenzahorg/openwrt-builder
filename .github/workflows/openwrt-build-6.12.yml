@@ -59,7 +59,7 @@ jobs:
   defconfig:
     name: Configure OpenWrt
     runs-on: self-hosted
-    needs: build-mtk-openwrt-feeds
+    needs: start-docker-container
     steps:
       - name: Configure OpenWrt
         run: |
