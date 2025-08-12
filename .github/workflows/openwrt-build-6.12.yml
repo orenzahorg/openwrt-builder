@@ -1,0 +1,136 @@
+# This workflow automates the OpenWrt build process based on your provided bash script.
+# It clones the necessary repositories, configures feed revisions, and runs the autobuild script.
+
+name: OpenWrt 6.12 BPI-R4 SD Card Image Build 🛠️
+
+# Define when this workflow should run.
+on:
+  # Allows you to run this workflow manually from the GitHub Actions UI.
+  workflow_dispatch:
+  # You can also uncomment the 'push' event to trigger on code changes.
+  # push:
+  #   branches:
+  #     - main
+  #     - develop
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  pull-requests: write
+  
+# Define the jobs that will be executed as part of this workflow.
+jobs:
+  checkout-openwrt:
+    name: Clean and Checkout OpenWrt Repository
+    runs-on: self-hosted
+    steps:
+      - name: Clean OpenWrt Repository
+        run: |
+          rm -rf openwrt
+          rm -rf mtk-openwrt-feeds
+      - name: Checkout Workflow Repository
+        uses: actions/checkout@v4
+
+        
+  pull-repositories:
+    name: Pull Repositories
+    runs-on: self-hosted
+    needs: checkout-openwrt
+    steps:
+      - name: Clean OpenWrt Repository
+        run: |
+          rm -rf openwrt
+      - name: Pull OpenWrt Repository
+        run: |
+          git clone https://github.com/openwrt/openwrt.git
+
+  start-docker-container:
+    name: Start Docker Container
+    runs-on: self-hosted
+    needs: pull-repositories
+    steps:
+      - name: Start Docker Container
+        run: |
+          docker stop openwrt-imagebuilder || true
+          docker rm openwrt-imagebuilder || true
+          docker run --name openwrt-imagebuilder --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' -d openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'sleep infinity'
+
+  defconfig:
+    name: Configure OpenWrt
+    runs-on: self-hosted
+    needs: build-mtk-openwrt-feeds
+    steps:
+      - name: Configure OpenWrt
+        run: |
+          set -exu -o pipefail
+          bash patch-6.12.sh
+      - name: Defconfig
+        working-directory: openwrt
+        run: |
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make defconfig'
+
+  build-openwrt:
+    name: Build OpenWrt
+    # Specify the runner environment. 'ubuntu-latest' is a GitHub-hosted runner.
+    # For very resource-intensive builds, consider using a 'self-hosted' runner.
+    # needs: pull-repositories
+    runs-on: self-hosted
+    needs: defconfig
+      # Step 6: Run the main OpenWrt autobuild script.
+      # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
+    steps:
+      # Step 7: Run the main OpenWrt autobuild script.
+      # The 'working-directory' ensures the script runs from the 'openwrt' directory,
+      # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
+      - name: Run OpenWrt Build
+        working-directory: openwrt
+        run: |
+          set -exu -o pipefail
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && make -j$(($(nproc)+1)) V=s'
+
+  upload-artifacts:
+    name: Upload Artifacts
+    runs-on: self-hosted
+    needs: build-openwrt
+    steps:
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: openwrt
+      #     path: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz 
+      - name: "Set current date as env variable"
+        run: |
+          echo "builddate=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+        id: version  # this is used on variable path          
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: create_release  
+        uses: ncipollo/release-action@v1.18.0
+        with:          
+          tag: ${{ steps.version.outputs.builddate }}
+          name: OpenWRT BPI-R4 SD Card Image ${{ steps.date.outputs.date }}
+          artifacts: openwrt/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/tmp/openwrt-mediatek-filogic-bananapi_bpi-r4-sdcard.img.gz 
+          artifactContentType: application/octet-stream
+          draft: false
+          prerelease: false
+
+
+  clean-up-docker-container-success:
+    needs: upload-artifacts
+    runs-on: self-hosted
+    if: ${{ needs.upload-artifacts.result == 'success' }}
+    steps:
+      - name: Clean Up Docker Container
+        run: |
+          docker stop openwrt-imagebuilder
+
+  clean-up-docker-container-failed:
+    needs: build-openwrt
+    runs-on: self-hosted
+    if: ${{ always() && !cancelled() && (needs.build-openwrt.result != 'success') }}
+    steps:
+      - name: Clean Up Docker Container
+        run: |
+          docker stop openwrt-imagebuilder

@@ -13,7 +13,4 @@ echo 'CONFIG_MEDIATEK_NETSYS_V3=y' >> target/linux/mediatek/filogic/config-6.6
 sed -i '/CONFIG_EXTRA_FIRMWARE/d' target/linux/mediatek/filogic/config-6.6
 sed -i '/CONFIG_EXTRA_FIRMWARE_DIR/d' target/linux/mediatek/filogic/config-6.6
 
-# patch thermal
-curl https://github.com/openwrt/openwrt/commit/54c1ba940d76d5b25f898b3ca0923641f895d304.patch | git apply
-
 cd -
