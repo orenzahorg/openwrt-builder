@@ -56,11 +56,14 @@ jobs:
           docker rm openwrt-imagebuilder || true
           docker run --name openwrt-imagebuilder --rm --user $(id -u):$(id -g) --ulimit 'nofile=1024:262144' --volume "$(pwd):/workdir" --workdir '/workdir' -d openwrt/imagebuilder:mediatek-filogic  /bin/bash -c 'sleep infinity'
 
-  defconfig:
+  config:
     name: Configure OpenWrt
     runs-on: self-hosted
     needs: start-docker-container
     steps:
+      - name: LuCI
+        run: |
+          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a'
       - name: Configure OpenWrt
         run: |
           set -exu -o pipefail
@@ -76,7 +79,7 @@ jobs:
     # For very resource-intensive builds, consider using a 'self-hosted' runner.
     # needs: pull-repositories
     runs-on: self-hosted
-    needs: defconfig
+    needs: config
       # Step 6: Run the main OpenWrt autobuild script.
       # allowing the relative path to 'mtk-openwrt-feeds' to work correctly.
     steps:
