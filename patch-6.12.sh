@@ -2,6 +2,11 @@
 set -exu -o pipefail
 
 cd openwrt
+docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds update luci'
+docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds update packages'
+
+docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds install luci'
+docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds install packages'
 
 
 for config in ../configs/*; do

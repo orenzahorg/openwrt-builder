@@ -61,9 +61,6 @@ jobs:
     runs-on: self-hosted
     needs: start-docker-container
     steps:
-      - name: LuCI
-        run: |
-          docker exec openwrt-imagebuilder /bin/bash -c 'cd openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a'
       - name: Configure OpenWrt
         run: |
           set -exu -o pipefail
